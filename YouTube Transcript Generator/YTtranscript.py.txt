@@ -1,0 +1,27 @@
+from youtube_transcript_api import YouTubeTranscriptApi
+
+def get_transcript(video_url):
+    try:
+        video_id = video_url.split("v=")[-1].split("&")[0]
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
+
+        try:
+            transcript = transcript_list.find_manually_created_transcript(['en'])
+        except:
+            transcript = transcript_list.find_generated_transcript(['en'])
+
+        fetched = transcript.fetch()
+        full_text = " ".join([entry.text for entry in fetched])  # updated line
+        return full_text
+    except Exception as e:
+        print("[ERROR]:", e)
+        return None
+
+if __name__ == "__main__":
+    url = input("Paste YouTube video URL: ").strip()
+    result = get_transcript(url)
+    if result:
+        print("\nTranscript (first 1000 chars):\n")
+        print(result[:1000])
+    else:
+        print("❌ Could not fetch transcript.")
